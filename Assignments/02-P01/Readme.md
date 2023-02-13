@@ -4,7 +4,6 @@
 ### Revanth Rajaboina
 ### Description:
 In this project we designed a simple code for tetris game using two classes which are tetrisblock and tetris.Tetris block class helps to produce the blocks and Tetris has the main game loop.
-Before starting you should install pygame using `pip install pygame'
 
 
 ### Files
@@ -17,6 +16,6 @@ Before starting you should install pygame using `pip install pygame'
 
 ### Instructions
 
-- Make sure you install library pygame
+- Make sure you install library pygame using `pip install pygame'
 `
     - `python main.py
