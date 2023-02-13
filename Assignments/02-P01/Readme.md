@@ -16,6 +16,6 @@ In this project we designed a simple code for tetris game using two classes whic
 
 ### Instructions
 
-- Make sure you install library pygame using `pip install pygame'
-`
-    - `python main.py
+- Make sure you install library pygame using `pip install pygame`
+
+    - `python main.py`
