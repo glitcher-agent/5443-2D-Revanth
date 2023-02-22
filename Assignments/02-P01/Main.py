@@ -1,13 +1,23 @@
 import pygame
 import random
 # Define colors
-colors = [(255,211,155), (127,255,212), (155,205,155), (238,106,167), (255,106,106), (180, 34, 22), (100,149,237),]
+colors = [
+    (255,211,155),
+    (127,255,212),
+    (155,205,155),
+    (238,106,167),
+    (255,106,106),
+    (180, 34, 22),
+    (100,149,237),
+]
+
 
 class Block:
     x = 0
     y = 0
    
-    # Define Tetrominos
+    # Define Tetrominos that have list of lists of blocks 
+    # the main list contains block types, and the inner lists contain their rotations. 
     tetrimonis = [
          [[1, 2, 5, 9], [0, 4, 5, 6], [1, 5, 9, 8], [4, 5, 6, 10]],
          [[1, 2, 6, 10], [5, 6, 7, 9], [2, 6, 10, 11], [3, 5, 6, 7]],
@@ -18,6 +28,7 @@ class Block:
          [[1, 4, 5, 6], [1, 4, 5, 9], [4, 5, 6, 9], [1, 5, 6, 9]],
     ]
 # Initialize grid
+#randomly pick a type and a color
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -59,7 +70,7 @@ class Tetris:
     #define for the new tetris block
     def new_block(self):
         self.block = Block(3, 0)
-    # define to determine whether two block collision
+#check if the currently flying figure intersecting with something fixed on the field
     def collision(self):
         collision = False
         for i in range(4):
@@ -84,7 +95,7 @@ class Tetris:
                 for i1 in range(i, 1, -1):
                     for j in range(self.width):
                         self.field[i1][j] = self.field[i1 - 1][j]
-                        screen.blit(text_game_over, [40, 200])
+                        linesound.play ()
                         
         self.score += lines ** 2
     def freeze(self):
@@ -117,8 +128,12 @@ class Tetris:
             self.block.rotation = old_rotation
 
 
-# Initialize the gameGrid engine
+# Initialize the game engine
 pygame.init()
+#sound
+linesound = pygame.mixer.Sound("Assignments/02-P01/beep.wav")
+#sound
+gameover = pygame.mixer.Sound("Assignments/02-P01/gameover.wav")
 
 # Define some colors
 black = (0, 0, 0)
@@ -128,42 +143,42 @@ gray = (128, 128, 128)
 size = (400, 500)
 screen = pygame.display.set_mode(size)
 
-pygame.display.set_caption("Tetris gameGrid")
+pygame.display.set_caption("Tetris Game by Revanth and Nageswar")
 
 done = False
 clock = pygame.time.Clock()
-speed = 20
-gameGrid = Tetris(20, 10)
+fps = 25
+game = Tetris(20, 10)
 counter = 0
 
 pressing_down = False
 
-# Start gameGrid loop
+# Start game loop
 while not done:
-    if gameGrid.block is None:
-        gameGrid.new_block()
+    if game.block is None:
+        game.new_block()
     counter += 1
     if counter > 100000:
         counter = 0
 
-    if counter % (speed // gameGrid.level // 1) == 0 or pressing_down:
-        if gameGrid.state == "start":
-            gameGrid.go_down()
+    if counter % (fps // game.level // 2) == 0 or pressing_down:
+        if game.state == "start":
+            game.go_down()
      # Check for key press events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
-                gameGrid.rotate()
+                game.rotate()
             if event.key == pygame.K_DOWN:
                 pressing_down = True
             if event.key == pygame.K_LEFT:
-                gameGrid.go_side(-1)
+                game.go_side(-1)
             if event.key == pygame.K_RIGHT:
-                gameGrid.go_side(1)
+                game.go_side(1)
             if event.key == pygame.K_ESCAPE:
-                gameGrid.__init__(20, 10)
+                game.__init__(20, 10)
 
     if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
@@ -171,35 +186,39 @@ while not done:
     # Clear the screen
     screen.fill(black)
 
-    for i in range(gameGrid.height):
-        for j in range(gameGrid.width):
-            pygame.draw.rect(screen, white, [gameGrid.x + gameGrid.zoom * j, gameGrid.y + gameGrid.zoom * i, gameGrid.zoom, gameGrid.zoom], 1)
-            if gameGrid.field[i][j] > 0:
-                pygame.draw.rect(screen, colors[gameGrid.field[i][j]],
-                                 [gameGrid.x + gameGrid.zoom * j + 1, gameGrid.y + gameGrid.zoom * i + 1, gameGrid.zoom - 2, gameGrid.zoom - 1])
+    for i in range(game.height):
+        for j in range(game.width):
+            pygame.draw.rect(screen, white, [game.x + game.zoom * j, game.y + game.zoom * i, game.zoom, game.zoom], 1)
+            if game.field[i][j] > 0:
+                pygame.draw.rect(screen, colors[game.field[i][j]],
+                                 [game.x + game.zoom * j + 1, game.y + game.zoom * i + 1, game.zoom - 2, game.zoom - 1])
      # Draw the current Tetromino
-    if gameGrid.block is not None:
+    if game.block is not None:
         for i in range(4):
             for j in range(4):
                 p = i * 4 + j
-                if p in gameGrid.block.tetrisblock():
-                    pygame.draw.rect(screen, colors[gameGrid.block.color],
-                                     [gameGrid.x + gameGrid.zoom * (j + gameGrid.block.x) + 1,
-                                      gameGrid.y + gameGrid.zoom * (i + gameGrid.block.y) + 1,
-                                      gameGrid.zoom - 2, gameGrid.zoom - 2])
+                if p in game.block.tetrisblock():
+                    pygame.draw.rect(screen, colors[game.block.color],
+                                     [game.x + game.zoom * (j + game.block.x) + 1,
+                                      game.y + game.zoom * (i + game.block.y) + 1,
+                                      game.zoom - 2, game.zoom - 2])
 
-    font = pygame.font.SysFont('Calibri', 25, True, False)
-    font1 = pygame.font.SysFont('Calibri', 65, True, False)
-    text = font.render("Score: " + str(gameGrid.score), True, white)
-    text_game_over = font1.render("gameGrid Over", True, (255, 125, 0))
-    text_game_over1 = font1.render("Press ESC", True, (255, 215, 0))
+    font = pygame.font.SysFont('Calibri', 30, True, False)
+    font1 = pygame.font.SysFont('Calibri', 55, True, False)
+    score = font.render("Score: " + str(game.score), True, white)
+    text_game_over = font1.render("Game Over", True, (255, 125, 0))
+    text_game_over1 = font.render("Press ESC to Start Again", True, (255, 215, 0))
 
-    screen.blit(text, [0, 0])
-    if gameGrid.state == "gameover":
+    screen.blit(score, [0, 0])
+    if game.state == "gameover":
+        screen.fill(black)
         screen.blit(text_game_over, [40, 200])
         screen.blit(text_game_over1, [40, 275])
+        score=font1.render("Your Score: " + str(game.score), True, white)
+        screen.blit(score, [40, 350])
+        gameover.play()
 
     pygame.display.flip()
-    clock.tick(speed)
+    clock.tick(fps)
 
 pygame.quit()
