@@ -1,5 +1,10 @@
+################
+#TETRIS
+#Course: CMPS 5443
+################
 import pygame
 import random
+
 # Define colors
 colors = [
     (255,211,155),
@@ -11,7 +16,34 @@ colors = [
     (100,149,237),
 ]
 
-
+class MySprite(pygame.sprite.Sprite):
+    def __init__(self):
+        super(MySprite, self).__init__()
+ 
+        self.images = []
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk1.png'))
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk2.png'))
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk3.png'))
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk4.png'))
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk5.png'))
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk6.png'))
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk7.png'))
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk8.png'))
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk9.png'))
+        self.images.append(pygame.image.load('D:/Users/revan/Downloads/Sprites/images/walk10.png'))
+ 
+        self.index = 0
+ 
+        self.image = self.images[self.index]
+        self.rect = pygame.Rect(1, 1, 1, 1)
+ 
+    def update(self):
+        self.index += 1
+ 
+        if self.index >= len(self.images):
+            self.index = 0
+        
+        self.image = self.images[self.index]
 class Block:
     x = 0
     y = 0
@@ -30,15 +62,17 @@ class Block:
 # Initialize grid
 #randomly pick a type and a color
     def __init__(self, x, y):
+         
         self.x = x
         self.y = y
         self.type = random.randint(0, len(self.tetrimonis) - 1)
         self.color = random.randint(1, len(colors) - 1)
         self.rotation = 0
-
+    
     def tetrisblock(self):
         return self.tetrimonis[self.type][self.rotation]
 #Defining the rotation of the block
+
     def rotate(self):
         self.rotation = (self.rotation + 1) % len(self.tetrimonis[self.type])
 
@@ -52,7 +86,7 @@ class Tetris:
         self.field = []
         self.height = 0
         self.width = 0
-        self.x = 100
+        self.x = 200
         self.y = 60
         self.zoom = 20
         self.block = None
@@ -107,7 +141,6 @@ class Tetris:
         self.new_block()
         if self.collision():
             self.state = "gameover"
-#key actions
 
     def go_down(self):
         self.block.y += 1
@@ -139,18 +172,17 @@ gameover = pygame.mixer.Sound("Assignments/02-P01/gameover.wav")
 black = (0, 0, 0)
 white = (255, 255, 255)
 gray = (128, 128, 128)
-
-size = (400, 500)
+#teris grid size
+size = (600, 500)
 screen = pygame.display.set_mode(size)
-
 pygame.display.set_caption("Tetris Game by Revanth and Nageswar")
-
+my_sprite = MySprite()
+my_group = pygame.sprite.Group(my_sprite)
 done = False
 clock = pygame.time.Clock()
 fps = 25
 game = Tetris(20, 10)
 counter = 0
-
 pressing_down = False
 
 # Start game loop
@@ -185,7 +217,7 @@ while not done:
                 pressing_down = False
     # Clear the screen
     screen.fill(black)
-
+   
     for i in range(game.height):
         for j in range(game.width):
             pygame.draw.rect(screen, white, [game.x + game.zoom * j, game.y + game.zoom * i, game.zoom, game.zoom], 1)
@@ -203,13 +235,15 @@ while not done:
                                       game.y + game.zoom * (i + game.block.y) + 1,
                                       game.zoom - 2, game.zoom - 2])
 
+    fonttetris=pygame.font.SysFont('Calibri', 30, True, False)
     font = pygame.font.SysFont('Calibri', 30, True, False)
     font1 = pygame.font.SysFont('Calibri', 55, True, False)
+    namegame = font.render("Tetris ", True, white)
     score = font.render("Score: " + str(game.score), True, white)
     text_game_over = font1.render("Game Over", True, (255, 125, 0))
     text_game_over1 = font.render("Press ESC to Start Again", True, (255, 215, 0))
-
-    screen.blit(score, [0, 0])
+    screen.blit(namegame, [250, 0])
+    screen.blit(score, [480, 0])
     if game.state == "gameover":
         screen.fill(black)
         screen.blit(text_game_over, [40, 200])
@@ -217,8 +251,11 @@ while not done:
         score=font1.render("Your Score: " + str(game.score), True, white)
         screen.blit(score, [40, 350])
         gameover.play()
-
+        my_group.update()
+        my_group.draw(screen)
+        pygame.display.update()
+        
+    clock.tick(20)
     pygame.display.flip()
-    clock.tick(fps)
 
 pygame.quit()
